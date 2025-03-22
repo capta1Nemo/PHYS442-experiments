@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "multiple_fit.C": "cpp",
+        "expo_fit.C": "cpp",
+        "linemy.C": "cpp",
+        "batch_fit.C": "cpp"
+    }
+}
