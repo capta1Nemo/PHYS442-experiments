@@ -1,5 +1,4 @@
 void batch_fit(const char* inputFolder = "./data", const char* outputFolder = "./results") {
-    // Create a system directory object to list files
     TSystemDirectory dir(inputFolder, inputFolder);
     TList *files = dir.GetListOfFiles();
     if (!files) {
@@ -7,54 +6,58 @@ void batch_fit(const char* inputFolder = "./data", const char* outputFolder = ".
         return;
     }
 
-    // Loop over files
+    // Open a results file to store p1 values
+    TString resultsFile = TString(outputFolder) + "/fit_results.txt";
+    ofstream results(resultsFile.Data(), ios::out);
+    if (!results) {
+        cout << "Error: Unable to open results file for writing!" << endl;
+        return;
+    }
+
+    results << "Filename\tlambda_Value" << endl; // Header
+
     TIter next(files);
     TSystemFile *file;
     while ((file = (TSystemFile*)next())) {
         TString filename = file->GetName();
 
-        // Process only .txt files
         if (!filename.EndsWith(".txt")) continue;
 
-        // Construct full file path
         TString filepath = TString(inputFolder) + "/" + filename;
         cout << "Processing: " << filepath << endl;
 
-        // Read the data file into a graph
         TGraphErrors *mygraph = new TGraphErrors(filepath);
-        mygraph->SetTitle("Exponential fit to T_i to 1/s_i");
+        TString title = TString::Format("Fit for %s", filename.Data());
+        title.ReplaceAll(".txt", ""); 
+        mygraph->SetTitle(title);
 
-        // Create a fitting function
-        TF1 *expo_fit = new TF1("expo_fit","[0]*exp([1]*x)",0,250);
-        expo_fit->SetParameters(100, -0.02);
+        TF1 *expo_fit = new TF1("expo_fit","[0]*exp(-[1]*x)");
+        expo_fit->SetParameters(0.3, -0.01);
         expo_fit->SetLineColor(kRed);
         expo_fit->SetLineWidth(2);
 
-        // Perform fitting
-        mygraph->Fit(expo_fit, "R");
+        mygraph->Fit(expo_fit);
+        mygraph->GetXaxis()->SetTitle("T_{i} \\ (\\text{seconds})");
+        mygraph->GetYaxis()->SetTitle("1/s_{i} \\ (\\text{seconds}^{-1})");
 
-        // Set axis labels
-        mygraph->GetXaxis()->SetTitle("xdata (units)");
-        mygraph->GetYaxis()->SetTitle("ydata (units)");
-        mygraph->GetXaxis()->SetLimits(0, 250);
-        mygraph->SetMinimum(0);
-        mygraph->SetMaximum(0.4);
+        // Extract and store the lambda value
+        double p1 = expo_fit->GetParameter(1);
+        double p1_err = expo_fit->GetParError(1);
+        results << filename.Data() << "\t" << fixed << setprecision(5) << p1 << "\t" << setprecision(5) << p1_err << endl;
 
-        // Create and draw canvas
+
         TCanvas *c1 = new TCanvas();
         mygraph->Draw("A*");
+        gStyle->SetOptFit(1111);
 
-        // Construct output filename
         TString outputFilename = TString(outputFolder) + "/" + filename.ReplaceAll(".txt", ".png");
-
-        // Save the canvas as a PNG file
         c1->SaveAs(outputFilename);
-        
-        // Clean up memory
+    
         delete mygraph;
         delete expo_fit;
         delete c1;
     }
-
+    
+    results.close();
     cout << "Processing complete. Check the output folder: " << outputFolder << endl;
 }
