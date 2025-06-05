@@ -1,0 +1,16 @@
+Dosya isimlerinden U1, U3 ve T değerlerini okuabilirsiniz. Bu örnekte mesela T = 184C
+U1 = 0.82V ve U3 = 1.63V. 
+
+Excel ile düzeltmeyi seçebilirsiniz root ile işlemeden önce. En tepedeki değerlerle işimiz yok. 
+Data sütünlarından sadece Collector Current I_A / nA ve Acceleration Voltage U_2 / V lazım bize.
+Bu veriler de sağdan ikinci ve üçüncü sütunda mevcut.
+Bu kısımda da U_2 nin baştan biraz garip ölçümleri gelebiliyor ilk açıldığında,
+o yüzden U_2'nin düzgün artan bir seriye dönüştüğü yerden itibarenki datayı kullanın. İlk bir kaç ölçümü 
+silmeniz mantıklı olabilir bu durumda. Mesela bu örnekte U_2=3.45V ile başlıyor ama sonrasında 0.15'e düşüyor.
+Buna karşılık akım ise hala düşük ve artan görünüyor ki bu beklentilerimize hiç uygun da değil.
+O yüzden bu örnekte datanın ilk satırını sildiğimizde neredeyse tamamen monoton artan bir 
+U_2 görüyoruz. 
+Sonda da U_2=31.95V için 27 ölçüm var cihaz ölçüm almayı bitirene kadar. Burada da tekrar eden kısmı kesmenizi 
+öneririm.
+Size hazırladığım "edited" örnekte bu değişiklikleri görebilirsiniz. Bu hale getirdikten sonra ROOT analizinizi 
+rahatlıkla yapabilirsiniz.
